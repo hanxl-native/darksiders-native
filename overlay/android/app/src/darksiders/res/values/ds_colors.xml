@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The Darksiders II app's launcher icon: the game's own cover art on black (src/darksiders/res, the darksiders build only) -->
+    <color name="ds_icon_bg">#FF000000</color>
+</resources>
