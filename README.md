@@ -70,6 +70,9 @@ so zip the folder's contents, not the folder itself — and extracts it into
 build of your own can also carry `assets/darksiders/pack.zip`, which the app
 copies on first start.
 
+For the whole thing on a PC — the `.nup` merged from your game and DLC, and
+`pack.zip`, in one command — see [`tools/BUILD-PACK.md`](tools/BUILD-PACK.md).
+
 The profile and the pack are for the base game (v0); an update needs a pack built
 for it, and the app says so after a build.
 
