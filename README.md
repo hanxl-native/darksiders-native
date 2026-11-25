@@ -5,11 +5,19 @@
 **Darksiders II Deathinitive Edition** on an Android phone: one app, one button,
 60 fps and the resolution you choose.
 
-This is the app: the screen, the game setup, the build flow, the startup screen and
-the icon are this repository's. The runtime underneath is
+This is the app: the screen, the game setup, the build flow and the icon are this
+repository's. The runtime underneath is
 [Peanuts Native](https://github.com/igawa6/peanuts-native), which does the hard
 part of running the game's code and graphics (see [Credits](#credits)); the app
 shows its own name and art, not the runtime's.
+
+## Download
+
+[**DarksidersII-Native-v1.0.apk**](https://github.com/hanxl-native/darksiders-native/releases/latest) — 12 MB, Android 13+.
+
+The APK carries the app only: no game, no pack, no keys, no firmware. Get those
+from your own dump with the **[PC pack builder](https://github.com/hanxl-native/pack-builder)**
+(route A) or build them on the phone (route B).
 
 ## What this app adds
 
@@ -55,9 +63,10 @@ your phone.
 
 ## Play it — route A (with a PC, recommended)
 
-1. On the PC, in this repository's [`tools/`](tools/BUILD-PACK.md), run
-   `build-pack.cmd` (Windows) or `build-pack.sh` with your game and the DLC. It
-   makes **two files**: `DarksidersII.nup` and `pack.zip`.
+1. On the PC, download the **[PC pack builder](https://github.com/hanxl-native/pack-builder)**
+   (latest release) and run `build-pack.cmd` (Windows) or `build-pack.sh` with
+   `darksiders`, your game and the DLC. It makes **two files**:
+   `DarksidersII.nup` and `pack.zip`.
 2. Copy both to the phone (USB, SD card or cloud).
 3. Open the app → **PACK** → choose `pack.zip`; the card shows **Ready**.
 4. **GAME FILE** → choose `DarksidersII.nup` → **Move into the app** → wait

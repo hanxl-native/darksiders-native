@@ -143,6 +143,11 @@ public final class DarksidersLauncherActivity extends Activity {
 
     // ---- first run: the game's data from the APK ----
 
+    /** True when this build carries the asset: a public build has no pack.zip, and the PACK card imports the one the PC tool makes */
+    private boolean hasAsset(String path) {
+        try (InputStream in = getAssets().open(path)) { return true; } catch (IOException e) { return false; }
+    }
+
     private void prepare(Runnable after) {
         if (preparing) return;
         preparing = true;
@@ -151,7 +156,7 @@ public final class DarksidersLauncherActivity extends Activity {
             String error = null;
             try {
                 File pack = packDir();
-                if (!new File(pack, "pack.tsv").isFile()) {
+                if (!new File(pack, "pack.tsv").isFile() && hasAsset(ASSETS + "/pack.zip")) {
                     say("Copying the game data into the app (one time)…", 0);
                     File parent = pack.getParentFile();
                     if (parent != null && !parent.isDirectory() && !parent.mkdirs()) throw new IOException("cannot create " + parent);
@@ -888,7 +893,11 @@ public final class DarksidersLauncherActivity extends Activity {
         if (preparing) { toast("Still preparing the game data"); return; }
         if (basePath() != null) { build(); return; }
         if (!gameFile().isFile()) { toast("Choose the game file first (.nup, .nsp or .xci)"); pickGameFile(); return; }
-        if (!new File(packDir(), "pack.tsv").isFile()) { toast("The game data is not ready: opening it again"); prepare(null); return; }
+        if (!new File(packDir(), "pack.tsv").isFile()) {
+            toast("Import the pack first: PACK → the pack.zip the PC tool makes");
+            pickPack();
+            return;
+        }
         writeEnv();
         Intent i = new Intent(this, GameActivity.class)
                 .putExtra("title_id", TITLE_ID)
@@ -1015,7 +1024,7 @@ public final class DarksidersLauncherActivity extends Activity {
         boolean ready = !preparing && !importing && (canBuild || (nup && pack));
         if (playCard != null) playCard.setAlpha(ready ? 1f : 0.45f);
         if (playLabel != null) playLabel.setText(importing ? "IMPORTING…" : canBuild ? (nup ? "REBUILD GAME FILE" : "BUILD GAME FILE")
-                : nup ? (pack ? "PLAY" : "PREPARING…") : "CHOOSE THE GAME FILE");
+                : nup ? (pack ? "PLAY" : "IMPORT THE PACK") : "CHOOSE THE GAME FILE");
     }
 
     private TextView label(String text, int sp, int color, boolean bold) {
