@@ -15,9 +15,10 @@ shows its own name and art, not the runtime's.
 
 [**DarksidersII-Native-v1.0.apk**](https://github.com/hanxl-native/darksiders-native/releases/latest) — 12 MB, Android 13+.
 
-The APK carries the app only: no game, no pack, no keys, no firmware. Get those
-from your own dump with the **[PC pack builder](https://github.com/hanxl-native/pack-builder)**
-(route A) or build them on the phone (route B).
+The APK carries the app only: no game, no pack, no keys, no firmware. Get the
+game and the pack from your own dump with the **[PC pack builder](https://github.com/hanxl-native/pack-builder)**
+(route A); the phone can build the `.nup` (route B). The same release carries the
+tested **Mesa Turnip v26** driver: install it with **GPU DRIVER**.
 
 ## What this app adds
 
@@ -28,20 +29,22 @@ from your own dump with the **[PC pack builder](https://github.com/hanxl-native/
 | **60 fps and resolution** | A present-interval switch that holds 60 fps, and a render scale from 50 % to 200 %, both written as the runtime's switches. |
 | **Your keys, your firmware** | The APK carries no `prod.keys` and no console font. `KEYS` takes your own `prod.keys`; `FIRMWARE` takes your firmware folder or `.zip` and reads the shared fonts from it. Stand-in fonts (Noto, Droid) keep the game working before that. |
 | **Imports the pack** | The `PACK` card takes the code and shader data the runtime needs as a `.zip` (made on a PC, see below) and shows **Ready** once it is in place. |
-| **Turnip, picked for you** | Mesa Turnip is selected automatically when it is installed; the GPU driver card installs a driver zip or goes back to the system one. |
+| **GPU driver** | The GPU DRIVER card installs a driver `.zip` or goes back to the system one. Install **Mesa Turnip v26** (in the release assets) and select it: the S24+'s own Adreno driver shows corrupted graphics. |
 | **Saves** | Export and import as a zip. |
 | **Its own look** | The "D II" monogram, the cards and the launcher are this project's; no emulator name or art on any screen. |
 
 ## What you need
 
 The app plays from **two files**: the `.nup` (the game) and the **pack** (the code
-and shaders the runtime needs). You can make both **on a PC** (route A) or **on
-the phone** (route B).
+and shaders the runtime needs). The PC tool makes both (route A). The phone can
+build the `.nup` from your retail files (route B); the pack is the same for every
+base-game (v0) build, so it is made once with the PC tool and imported.
 
 Common to both routes:
 
 - an Android 13+ phone with **8 GB of RAM or more** (a Snapdragon 8 Gen 2/3 class device);
 - **your own copy of the game** (a dump of the card you own), `.xci` or `.nsp`;
+- the **Mesa Turnip v26** driver `.zip` (the tested GPU driver; in the release assets);
 - your console's **`prod.keys`**;
 - the **DLC** packs, if you want them;
 - your **save** as a `.zip`, if you want to bring one.
@@ -50,13 +53,14 @@ There is **no update step**: this app and its pack are for the base game (v0). A
 file that already carries an update is accepted, and the app warns that the pack
 was not made for that build.
 
-| | **A — with a PC** (recommended) | **B — phone only** |
+| | **A — with a PC** (recommended) | **B — the phone builds the `.nup`** |
 |---|---|---|
-| A computer | Windows with WSL2, Linux or macOS | — |
+| A computer | Windows with WSL2, Linux or macOS | for the pack (once) |
 | `prod.keys` on | the PC | the phone |
 | Firmware | not needed | optional (console fonts; stand-in fonts otherwise) |
-| Who builds the pack | the PC tool | the app |
-| Time | ~15–40 min on the PC, then minutes | 1–2 h on the phone |
+| Who builds the `.nup` | the PC tool | the app |
+| Who builds the pack | the PC tool | the PC tool (the app imports it) |
+| Time | ~15–40 min (the shaders, once) | minutes for the `.nup` |
 
 Nothing is uploaded anywhere: the tools run on your machine and the files stay on
 your phone.
@@ -76,16 +80,18 @@ your phone.
 No keys or firmware on the phone with this route: the `.nup` already holds the
 DLC, and the pack holds the shaders.
 
-## Play it — route B (all on the phone)
+## Play it — route B (the phone builds the `.nup`)
 
-1. **KEYS** → your `prod.keys`. Without it the app cannot read the game files.
-2. **FIRMWARE** *(optional)* → your firmware `.zip` or folder, for the console's
+1. **PACK** → import the `pack.zip` made on the PC (route A, step 1). It is the
+   same for every base-game (v0) build, so it is made once.
+2. **KEYS** → your `prod.keys`. Without it the app cannot read the game files.
+3. **FIRMWARE** *(optional)* → your firmware `.zip` or folder, for the console's
    own fonts. Skipping it is fine.
-3. **GAME FILE** → the base `.xci`/`.nsp`. It is only read for now.
-4. **DLC** *(optional)* → the add-on `.nsp` files; you can select many at once.
-5. **BUILD GAME FILE** → confirm the space, then wait (1–2 h on a phone). You can
-   cancel.
-6. **PLAY**.
+4. **GAME FILE** → the base `.xci`/`.nsp`. It is only read for now.
+5. **DLC** *(optional)* → the add-on `.nsp` files; you can select many at once.
+6. **BUILD GAME FILE** → confirm the space, then wait (minutes; the phone writes
+   the `.nup`). You can cancel.
+7. **PLAY**.
 
 ## Your save
 
@@ -94,19 +100,21 @@ one as a `.zip`. The save is kept in the app's folder, so it survives updates.
 
 ## Build the app from source
 
-The app is an **overlay** on Peanuts Native `v0.1.7-1`. Two pieces:
+The app is an **overlay** on Peanuts Native `v0.1.7-1`: the patches and the overlay.
 
 - `patches/0001-darksiders-hooks.patch` — turns the upstream launcher into this
   app: the single screen becomes the launcher, the build gets the app's name and
   its assets folder, the startup screen drops the runtime's art for a named
   build, and the firmware picker is made public.
-- `overlay/` — the screen (`DarksidersLauncherActivity`), the icons and the
-  redistributable fonts.
+- `patches/0002-256-inputs.patch` — raises the importer's 64-file limit to 256
+  (the same fix the PC pack builder uses).
+- `overlay/` — the screen (`DarksidersLauncherActivity`), the icons, the
+  redistributable fonts and the game profile (`dm/games/010071800BA98000`).
 
-`apply.sh` clones the release, copies the overlay in and applies the patch.
+`apply.sh` clones the release, applies both patches and copies the overlay in.
 
 ```sh
-./apply.sh                 # clones upstream at v0.1.7-1, copies the overlay, applies the patch
+./apply.sh                 # clones upstream at v0.1.7-1, applies the patches, copies the overlay
 cd peanuts-native/android/app
 JAVA_HOME=/path/to/jdk17 ANDROID_HOME=/path/to/android-sdk \
   ./gradlew apk -PnxApp=peanuts -PnxAppId=darksiders -PnxLabel="Darksiders II Native" \
@@ -125,7 +133,8 @@ it — the pack holds the game's own translated shaders.
 
 All of the testing so far is on a **Samsung Galaxy S24+ (Snapdragon 8 Gen 3,
 Adreno 750)**, Android 16, where it holds a **steady 60 fps** with Mesa Turnip.
-(The phone's own Adreno driver works too, but Turnip is what the app selects.)
+(The phone's own Adreno driver shows corrupted graphics on this device: install
+Turnip with GPU DRIVER and select it.)
 
 That is the only device it has been run on. A Snapdragon 8 Gen 2/3 class phone is
 what the app is aimed at; on more modest hardware expect a lower frame rate and a
