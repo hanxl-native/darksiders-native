@@ -2,43 +2,48 @@
 
 ![screenshot](docs/darksiders-ui.png)
 
-**Darksiders II Deathinitive Edition** on an Android phone: a standalone Android app that plays Darksiders II Deathinitive Edition on a Snapdragon phone, built on the Peanuts Native runtime.
+**Darksiders II Deathinitive Edition** on an Android phone: one app, one button,
+60 fps and the resolution you choose.
 
-This repository holds the app's own screen, its icon and the small hooks it adds to
-the runtime. The emulator itself is not here: the app is built on top of
-[Peanuts Native](https://github.com/igawa6/peanuts-native) (MIT; the Android host
-is GPL-3.0-or-later, see [NOTICE](NOTICE)).
+This is the app: the screen, the game setup, the build flow and the icon are this
+repository's. The runtime underneath is [Peanuts Native](https://github.com/igawa6/peanuts-native),
+which does the hard part of running the game's code and graphics (see
+[Credits](#credits)).
 
-## What it does
+## What this app adds
 
-- **One screen, one button.** The app's launcher has the game file, the update, the
-  DLC, the GPU driver, the picture scale, the saves, and the console's keys and
-  firmware. No emulator menus.
-- **Builds the game file in the app.** `GAME FILE` takes the game's own
-  `.nsp`/`.xci` (or a ready `.nup`), `DLC` takes any number of add-on files, and
-  `BUILD GAME FILE` merges them into one `.nup` with the importer that ships in
-  the APK. The game data pack and profile are for the base game (v0); Build warns if a file carries an update.
-- **Your keys and firmware stay yours.** The APK carries no `prod.keys` and no
-  console font: `KEYS` takes your `prod.keys` and `FIRMWARE` takes your firmware
-  folder or `.zip` (the NCAs flat inside), which the importer reads into the
-  app's fonts folder.
-- **GPU driver.** Mesa Turnip is picked automatically when it is installed in
-  `files/gpu_drivers/` (the app's `GPU DRIVER` card installs a driver zip and lets
-  you go back to the phone's own).
-- **Saves** export and import as a zip.
+| | |
+|---|---|
+| **One screen** | The game file, the DLC, the GPU driver, the frame rate and resolution, the saves, the console's keys and firmware. No emulator menus. |
+| **Builds the `.nup` in the app** | Pick the game's own `.nsp`/`.xci` and any number of DLC packs; `BUILD GAME FILE` merges them into one `.nup` with the importer that ships in the APK. A file that already holds an update is taken as it is, and the app warns if the build is not the one its pack was made for. |
+| **60 fps and resolution** | A present-interval switch that holds 60 fps, and a render scale from 50 % to 200 %, both written as the runtime's switches. |
+| **Your keys, your firmware** | The APK carries no `prod.keys` and no console font. `KEYS` takes your own `prod.keys`; `FIRMWARE` takes your firmware folder or `.zip` and reads the shared fonts from it. Stand-in fonts (Noto, Droid) keep the game working before that. |
+| **Turnip, picked for you** | Mesa Turnip is selected automatically when it is installed; the GPU driver card installs a driver zip or goes back to the system one. |
+| **Saves** | Export and import as a zip. |
+| **An icon of its own** | A "D II" monogram drawn for this project (no game art). |
+
+## How it is put together
+
+The app is an **overlay** on Peanuts Native `v0.1.7-1`. Two pieces:
+
+- `patches/0001-darksiders-hooks.patch` — turns the upstream launcher into this
+  app: the single screen becomes the launcher, the build gets the app's name and
+  its assets folder, and the firmware picker is made public.
+- `overlay/` — the screen (`DarksidersLauncherActivity`), the icons and the
+  redistributable fonts.
+
+`apply.sh` clones the release, copies the overlay in and applies the patch. The
+app's own code is about a thousand lines of Java in this repository; the runtime
+is upstream's.
 
 ## Requirements
 
-- A phone with Android 13+ and 8 GB of RAM or more (a Snapdragon 8 Gen 2/3 class
-  device is what it was made for).
-- **Your own copy of the game** (a dump of the card you own) and, for a build from
-  `.nsp`/`.xci`, your console's `prod.keys`.
+- Android 13+ and 8 GB of RAM or more (a Snapdragon 8 Gen 2/3 class phone).
+- **Your own copy of the game** (a dump of the card you own) and your console's
+  `prod.keys` to build from `.nsp`/`.xci`.
 - No game data is included in this repository or in its releases.
 
 ## Build
-
-The app is an overlay on Peanuts Native: the script clones the pinned release,
-copies the app's files in and applies the hooks patch.
 
 ```sh
 ./apply.sh                 # clones upstream at v0.1.7-1, copies the overlay, applies the patch
@@ -49,23 +54,23 @@ JAVA_HOME=/path/to/jdk17 ANDROID_HOME=/path/to/android-sdk \
 # android/app/out/nxnative-android-peanuts.apk
 ```
 
-`apply.sh` needs `git`, a JDK 17 and the Android SDK (build-tools, NDK 28.2).
-The first build takes a few minutes (the native host is compiled from source).
+Needs `git`, JDK 17 and the Android SDK (build-tools, NDK 28.2). The first build
+compiles the native host and takes a few minutes.
 
 ### The game data pack
 
 The `.nup` is the game; the **pack** is the code and shader data the runtime needs
-next to it (`files/packs/010071800BA98000/`). It is built from the game on a computer
-or on the phone with Peanuts Native's **Prepare**, and it is not distributed here
-(it holds the game's own translated shaders). Put your pack in
-`files/packs/010071800BA98000/` (or in `assets/darksiders/pack.zip` of your own build,
-which the app copies on first start).
+next to it (`files/packs/010071800BA98000/`). It is built from the game with
+Peanuts Native's **Prepare** (on a computer or on the phone), and it is not
+distributed here. Put your pack in `files/packs/010071800BA98000/`, or ship your
+own build with `assets/darksiders/pack.zip`, which the app copies on first start.
+The profile and the pack are for the base game (v0); an update needs a pack built
+for it, and the app says so after a build.
 
 ## Tested on
 
 Samsung Galaxy S24+ (Snapdragon 8 Gen 3, Adreno 750), Android 16: 60 fps with Mesa
-Turnip. The phone's own Adreno driver runs the menus but loses the device at some
-scene changes, which is why the app prefers Turnip.
+Turnip. The phone's own Adreno driver works but Turnip is what the app selects.
 
 ## Support
 
@@ -78,16 +83,15 @@ coffee:
 ## Credits
 
 - [Peanuts Native](https://github.com/igawa6/peanuts-native) by seedds and its
-  contributors: the runtime this app is built on (MIT; the Android host is
-  GPL-3.0-or-later — see [NOTICE](NOTICE)).
+  contributors: the runtime this app is built on (MIT; its Android host is
+  GPL-3.0-or-later, see [NOTICE](NOTICE)).
 - Mesa Turnip, Noto Sans (SIL OFL) and Droid Sans Fallback (Apache 2.0) for the
   pieces shipped with the app.
-- Not affiliated with Nintendo, Bandai Namco or Sora Ltd. The game's names and
+- Not affiliated with THQ Nordic, Gunfire Games or Nintendo. The game's names and
   cover art belong to their owners; this app ships neither.
 
 ## License
 
-The files in **this repository** (the launcher screen, the icon, the hooks patch
-and the scripts) are MIT, see [LICENSE](LICENSE). An APK built with them also
-contains Peanuts Native's Android host, so **the APK as a whole is
-GPL-3.0-or-later**; whoever passes it on must offer its complete source.
+This repository's own files are MIT, see [LICENSE](LICENSE). An APK built with
+them also contains Peanuts Native's Android host, so the APK as a whole is
+GPL-3.0-or-later; see [NOTICE](NOTICE).
