@@ -112,8 +112,14 @@ it — the pack holds the game's own translated shaders.
 
 ## Tested on
 
-Samsung Galaxy S24+ (Snapdragon 8 Gen 3, Adreno 750), Android 16: 60 fps with Mesa
-Turnip. The phone's own Adreno driver works but Turnip is what the app selects.
+All of the testing so far is on a **Samsung Galaxy S24+ (Snapdragon 8 Gen 3,
+Adreno 750)**, Android 16, where it holds a **steady 60 fps** with Mesa Turnip.
+(The phone's own Adreno driver works too, but Turnip is what the app selects.)
+
+That is the only device it has been run on. A Snapdragon 8 Gen 2/3 class phone is
+what the app is aimed at; on more modest hardware expect a lower frame rate and a
+longer first shader build — the **resolution scale** in GRAPHICS (75 % or 50 %) is
+the first thing to try. Reports from other phones are welcome.
 
 ## Support
 
