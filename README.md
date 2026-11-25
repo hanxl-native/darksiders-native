@@ -14,15 +14,75 @@ which does the hard part of running the game's code and graphics (see
 
 | | |
 |---|---|
-| **One screen** | The game file, the DLC, the GPU driver, the frame rate and resolution, the saves, the console's keys and firmware. No emulator menus. |
+| **One screen** | The game file, the DLC, the pack, the GPU driver, the frame rate and resolution, the saves, the console's keys and firmware. No emulator menus. |
 | **Builds the `.nup` in the app** | Pick the game's own `.nsp`/`.xci` and any number of DLC packs; `BUILD GAME FILE` merges them into one `.nup` with the importer that ships in the APK. A file that already holds an update is taken as it is, and the app warns if the build is not the one its pack was made for. |
 | **60 fps and resolution** | A present-interval switch that holds 60 fps, and a render scale from 50 % to 200 %, both written as the runtime's switches. |
 | **Your keys, your firmware** | The APK carries no `prod.keys` and no console font. `KEYS` takes your own `prod.keys`; `FIRMWARE` takes your firmware folder or `.zip` and reads the shared fonts from it. Stand-in fonts (Noto, Droid) keep the game working before that. |
+| **Imports the pack** | The `PACK` card takes the code and shader data the runtime needs as a `.zip` (made on a PC, see below) and shows **Ready** once it is in place. |
 | **Turnip, picked for you** | Mesa Turnip is selected automatically when it is installed; the GPU driver card installs a driver zip or goes back to the system one. |
 | **Saves** | Export and import as a zip. |
 | **An icon of its own** | A "D II" monogram drawn for this project (no game art). |
 
-## How it is put together
+## What you need
+
+The app plays from **two files**: the `.nup` (the game) and the **pack** (the code
+and shaders the runtime needs). You can make both **on a PC** (route A) or **on
+the phone** (route B).
+
+Common to both routes:
+
+- an Android 13+ phone with **8 GB of RAM or more** (a Snapdragon 8 Gen 2/3 class device);
+- **your own copy of the game** (a dump of the card you own), `.xci` or `.nsp`;
+- your console's **`prod.keys`**;
+- the **DLC** packs, if you want them;
+- your **save** as a `.zip`, if you want to bring one.
+
+There is **no update step**: this app and its pack are for the base game (v0). A
+file that already carries an update is accepted, and the app warns that the pack
+was not made for that build.
+
+| | **A — with a PC** (recommended) | **B — phone only** |
+|---|---|---|
+| A computer | Windows with WSL2, Linux or macOS | — |
+| `prod.keys` on | the PC | the phone |
+| Firmware | not needed | optional (console fonts; stand-in fonts otherwise) |
+| Who builds the pack | the PC tool | the app |
+| Time | ~15–40 min on the PC, then minutes | 1–2 h on the phone |
+
+Nothing is uploaded anywhere: the tools run on your machine and the files stay on
+your phone.
+
+## Play it — route A (with a PC, recommended)
+
+1. On the PC, in this repository's [`tools/`](tools/BUILD-PACK.md), run
+   `build-pack.cmd` (Windows) or `build-pack.sh` with your game and the DLC. It
+   makes **two files**: `DarksidersII.nup` and `pack.zip`.
+2. Copy both to the phone (USB, SD card or cloud).
+3. Open the app → **PACK** → choose `pack.zip`; the card shows **Ready**.
+4. **GAME FILE** → choose `DarksidersII.nup` → **Move into the app** → wait
+   (15 GB, a few minutes).
+5. **PLAY**.
+
+No keys or firmware on the phone with this route: the `.nup` already holds the
+DLC, and the pack holds the shaders.
+
+## Play it — route B (all on the phone)
+
+1. **KEYS** → your `prod.keys`. Without it the app cannot read the game files.
+2. **FIRMWARE** *(optional)* → your firmware `.zip` or folder, for the console's
+   own fonts. Skipping it is fine.
+3. **GAME FILE** → the base `.xci`/`.nsp`. It is only read for now.
+4. **DLC** *(optional)* → the add-on `.nsp` files; you can select many at once.
+5. **BUILD GAME FILE** → confirm the space, then wait (1–2 h on a phone). You can
+   cancel.
+6. **PLAY**.
+
+## Your save
+
+**SAVES** → choose a `.zip` to restore a save; the same card exports the current
+one as a `.zip`. The save is kept in the app's folder, so it survives updates.
+
+## Build the app from source
 
 The app is an **overlay** on Peanuts Native `v0.1.7-1`. Two pieces:
 
@@ -32,18 +92,7 @@ The app is an **overlay** on Peanuts Native `v0.1.7-1`. Two pieces:
 - `overlay/` — the screen (`DarksidersLauncherActivity`), the icons and the
   redistributable fonts.
 
-`apply.sh` clones the release, copies the overlay in and applies the patch. The
-app's own code is about a thousand lines of Java in this repository; the runtime
-is upstream's.
-
-## Requirements
-
-- Android 13+ and 8 GB of RAM or more (a Snapdragon 8 Gen 2/3 class phone).
-- **Your own copy of the game** (a dump of the card you own) and your console's
-  `prod.keys` to build from `.nsp`/`.xci`.
-- No game data is included in this repository or in its releases.
-
-## Build
+`apply.sh` clones the release, copies the overlay in and applies the patch.
 
 ```sh
 ./apply.sh                 # clones upstream at v0.1.7-1, copies the overlay, applies the patch
@@ -57,24 +106,9 @@ JAVA_HOME=/path/to/jdk17 ANDROID_HOME=/path/to/android-sdk \
 Needs `git`, JDK 17 and the Android SDK (build-tools, NDK 28.2). The first build
 compiles the native host and takes a few minutes.
 
-### The game data pack
-
-The `.nup` is the game; the **pack** is the code and shader data the runtime needs
-next to it (`files/packs/010071800BA98000/`). It is built from the game with
-Peanuts Native's **Prepare** (on a computer or on the phone), and it is not
-distributed here.
-
-The app's **PACK** card imports a `.zip` of that folder — `pack.tsv` at the root,
-so zip the folder's contents, not the folder itself — and extracts it into
-`files/packs/010071800BA98000/`; the card shows **Ready** once it is in place. A
-build of your own can also carry `assets/darksiders/pack.zip`, which the app
-copies on first start.
-
-For the whole thing on a PC — the `.nup` merged from your game and DLC, and
-`pack.zip`, in one command — see [`tools/BUILD-PACK.md`](tools/BUILD-PACK.md).
-
-The profile and the pack are for the base game (v0); an update needs a pack built
-for it, and the app says so after a build.
+A build of your own can carry `assets/darksiders/pack.zip` (the pack, copied on
+first start) and then the PACK card is not needed; a public build must not carry
+it — the pack holds the game's own translated shaders.
 
 ## Tested on
 
