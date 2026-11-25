@@ -5,10 +5,11 @@
 **Darksiders II Deathinitive Edition** on an Android phone: one app, one button,
 60 fps and the resolution you choose.
 
-This is the app: the screen, the game setup, the build flow and the icon are this
-repository's. The runtime underneath is [Peanuts Native](https://github.com/igawa6/peanuts-native),
-which does the hard part of running the game's code and graphics (see
-[Credits](#credits)).
+This is the app: the screen, the game setup, the build flow, the startup screen and
+the icon are this repository's. The runtime underneath is
+[Peanuts Native](https://github.com/igawa6/peanuts-native), which does the hard
+part of running the game's code and graphics (see [Credits](#credits)); the app
+shows its own name and art, not the runtime's.
 
 ## What this app adds
 
@@ -21,7 +22,7 @@ which does the hard part of running the game's code and graphics (see
 | **Imports the pack** | The `PACK` card takes the code and shader data the runtime needs as a `.zip` (made on a PC, see below) and shows **Ready** once it is in place. |
 | **Turnip, picked for you** | Mesa Turnip is selected automatically when it is installed; the GPU driver card installs a driver zip or goes back to the system one. |
 | **Saves** | Export and import as a zip. |
-| **An icon of its own** | A "D II" monogram drawn for this project (no game art). |
+| **Its own look** | The "D II" monogram, the cards and the launcher are this project's; no emulator name or art on any screen. |
 
 ## What you need
 
@@ -88,7 +89,8 @@ The app is an **overlay** on Peanuts Native `v0.1.7-1`. Two pieces:
 
 - `patches/0001-darksiders-hooks.patch` — turns the upstream launcher into this
   app: the single screen becomes the launcher, the build gets the app's name and
-  its assets folder, and the firmware picker is made public.
+  its assets folder, the startup screen drops the runtime's art for a named
+  build, and the firmware picker is made public.
 - `overlay/` — the screen (`DarksidersLauncherActivity`), the icons and the
   redistributable fonts.
 
